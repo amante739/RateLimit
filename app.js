@@ -3,13 +3,16 @@ const TokenBucket = require('./tokenBucket');
 
 const tokenBucket = new TokenBucket(100, 10, 50);
 function handleRequest(req, res, next) {
-     
-    if (tokenBucket.refillBucket(1)) {
+     const tokensNeeded = 1; 
+    if (tokenBucket.refillBucket(tokensNeeded)) {
       console.log("token bucket is not full");
-    next();
-  } else {
-    res.status(429).send('Too Many Requests');
-  }
+      next();
+    } else {
+      const waitTimeInSeconds =
+        (tokensNeeded - tokenBucket.tokens) / tokenBucket.tokensPerSecond;
+      const waitTimeMilliseconds = waitTimeInSeconds * 1000;
+      res.status(429).send("Too Many Requests wait till:"+waitTimeMilliseconds+"ms");
+    }
 }
 const app = express();
 
@@ -18,11 +21,7 @@ app.get('/unlimited',handleRequest, (req, res) => {
 });
 
 app.get("/limited", handleRequest, (req, res) => {
-     if (tokenBucket.consumeTokens(1)) {
-    next();
-  } else {
-    res.status(429).send('Too Many Requests');
-  }
+ 
   res.send("Hello World!");
 });
 

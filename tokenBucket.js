@@ -13,7 +13,7 @@ class tokenBucket{
         let newTokens = elapsedTime * this.tokensPerSecond;//10*5=50
         this.tokens = Math.min(this.tokens + newTokens, this.tokenCapacity);//100
         if(this.tokens < this.tokenCapacity){
-            console.log("token bucket is not full");
+            //console.log("token bucket is not full");
            this.tokens = this.tokens + newTokens;
             return true;;
         } else {
